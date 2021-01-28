@@ -1,8 +1,11 @@
 package com.amazonaws.lambda.playerinfo;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
@@ -15,24 +18,28 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonReader;
 
-public class LambdaFunctionHandler implements RequestHandler<Object, String> {
+public class LambdaFunctionHandler implements RequestHandler<Map<String,String>, List<PlayerInfo>> {
   	static AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().build();
   	static DynamoDB dynamoDB = new DynamoDB(client);
 	static DynamoDBMapper mapper = new DynamoDBMapper(client);
 
     public LambdaFunctionHandler() {}
 
-    public String handleRequest(Object event, Context context) {
+    public List<PlayerInfo> handleRequest(Map<String,String> event, Context context) {
         context.getLogger().log("Received event: " + event);
         Table userInformation = dynamoDB.getTable("user_details");
 
 		List<PlayerInfo> scanResult = mapper.scan(PlayerInfo.class, new DynamoDBScanExpression());
 		List<PlayerInfo> items = new ArrayList<>();		
 		
-        Gson g = new Gson();  
-        JsonObject json = g.fromJson(event.toString(), JsonObject.class);
-        String username = json.get("username").getAsString();
+//        Gson g = new Gson();  
+//        JsonReader reader = new JsonReader(new StringReader(event.toString()));
+//        reader.setLenient(true);
+//        
+//        JsonObject json = g.fromJson(reader, JsonObject.class);
+        String username = event.get("username");
 
         for(PlayerInfo currentPlayer: scanResult) {
         	if (currentPlayer.getUserName().equals(username)) {
@@ -49,6 +56,12 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
         	}
         }
         
-		return items.toString();
+        Map<String, Object> response = new HashMap<>();
+        Map<String, String> headers = new HashMap<>();
+//        response.put("statusCode", 200);
+        headers.put("Access-Control-Allow-Origin", "*");
+        response.put("headers", headers);
+        response.put("body", items);
+        return items;
     }
 }
