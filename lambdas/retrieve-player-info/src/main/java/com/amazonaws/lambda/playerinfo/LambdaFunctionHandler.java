@@ -7,28 +7,20 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//public class LambdaFunctionHandler implements RequestStreamHandler {
 public class LambdaFunctionHandler implements RequestHandler<ApiGatewayProxyRequest, ApiGatewayProxyResponse> {
 
     private final AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().build();
     private final DynamoDB dynamoDB = new DynamoDB(client);
     private final DynamoDBMapper mapper = new DynamoDBMapper(client);
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-//    public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) throws IOException {
-//        ApiGatewayProxyRequest event = objectMapper.readValue(inputStream, ApiGatewayProxyRequest.class);
 
     @SneakyThrows
     public ApiGatewayProxyResponse handleRequest(ApiGatewayProxyRequest event, Context context) {
@@ -57,7 +49,6 @@ public class LambdaFunctionHandler implements RequestHandler<ApiGatewayProxyRequ
         response.setHeaders(headers);
         response.setBody(objectMapper.writeValueAsString(items));
 
-//        objectMapper.writeValue(outputStream, response);
         return response;
     }
 }
