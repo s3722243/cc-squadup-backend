@@ -7,10 +7,13 @@ import java.util.Map;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+import lombok.Getter;
+import lombok.Setter;
 
 @DynamoDBTable(tableName = "history_store")
-public class PlayerInfo {
-	String userName, gamePlayed, dayPlayed, players;
+public class HistoryStore {
+	String userName, gamePlayed, dayPlayed;
+	List<String> players;
 	int historyId;
 	List<Map<String, Object>> playerInformationList = new ArrayList<>();
 	
@@ -52,11 +55,11 @@ public class PlayerInfo {
 	
 
 	@DynamoDBAttribute(attributeName = "players")
-	public String getPlayers() {
+	public List<String> getPlayers() {
 		return players;
 	}
 
-	public void setPlayers(String players) {
+	public void setPlayers(List<String> players) {
 		this.players = players;
 	}
 	
