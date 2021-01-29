@@ -5,33 +5,35 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
-@DynamoDBTable(tableName = "searchTables")
+@DynamoDBTable(tableName = "find_match")
 public class GameSearch {
 
-	private String gameName, username, playersFound;
-	private int playerNeeded;
+	private String gameId, username, playersFound, region, console;
+	private int playersNeeded;
 	
 	
 	
-	public GameSearch(String gameName, String username, int playerNeeded) {
+	public GameSearch(String gameId, String username, String playersFound, String region, String console,
+			int playersNeeded) {
 		super();
-		this.gameName = gameName;
+		this.gameId = gameId;
 		this.username = username;
-		this.playerNeeded = playerNeeded;
+		this.playersFound = playersFound;
+		this.region = region;
+		this.console = console;
+		this.playersNeeded = playersNeeded;
 	}
-	
 	
 	public GameSearch() {
-		super();
 	}
 
 
-	@DynamoDBHashKey(attributeName = "Game")
-	public String getGameName() {
-		return gameName;
+	@DynamoDBHashKey(attributeName = "game_id")
+	public String getGameId() {
+		return gameId;
 	}
-	public void setGameName(String gameName) {
-		this.gameName = gameName;
+	public void setGameId(String gameId) {
+		this.gameId = gameId;
 	}
 	
 	@DynamoDBAttribute(attributeName = "username")
@@ -43,11 +45,11 @@ public class GameSearch {
 	}
 	
 	@DynamoDBAttribute(attributeName = "players_needed")
-	public int getPlayerNeeded() {
-		return playerNeeded;
+	public int getPlayersNeeded() {
+		return playersNeeded;
 	}
-	public void setPlayerNeeded(int playerNeeded) {
-		this.playerNeeded = playerNeeded;
+	public void setPlayersNeeded(int playersNeeded) {
+		this.playersNeeded = playersNeeded;
 	}
 	
 	@DynamoDBAttribute(attributeName = "players_found")
@@ -57,11 +59,33 @@ public class GameSearch {
 	public void setPlayersFound(String playersFound) {
 		this.playersFound = playersFound;
 	}
+	
+	
+
+	@DynamoDBAttribute(attributeName = "region")
+	public String getRegion() {
+		return region;
+	}
+
+
+	public void setRegion(String region) {
+		this.region = region;
+	}
+
+	@DynamoDBAttribute(attributeName = "console")
+	public String getConsole() {
+		return console;
+	}
+
+
+	public void setConsole(String console) {
+		this.console = console;
+	}
 
 
 	@Override
 	public String toString() {
-		return "GameSearch [gameName=" + gameName + ", username=" + username + ", playerNeeded=" + playerNeeded + "]";
+		return "GameSearch [gameName=" + gameId + ", username=" + username + ", playerNeeded=" + playersNeeded + "]";
 	}
 	
 	

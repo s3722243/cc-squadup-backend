@@ -1,6 +1,5 @@
 package com.amazonaws.lambda.playerinfo;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,23 +15,20 @@ import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.stream.JsonReader;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class LambdaFunctionHandler implements RequestHandler<Map<String,Object>, Map<String, Object>> {
+import lombok.SneakyThrows;
+
+public class LambdaFunctionHandler implements RequestHandler<ApiGatewayProxyRequest, ApiGatewayProxyResponse > {
 	static AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().build();
 	static DynamoDB dynamoDB = new DynamoDB(client);
 	static DynamoDBMapper mapper = new DynamoDBMapper(client);
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
 	public LambdaFunctionHandler() {}
 
-	public Map<String, Object> handleRequest(Map<String,Object> event, Context context) {
-//		Gson g = new Gson();  
-//		JsonReader reader = new JsonReader(new StringReader(event.toString()));
-//		reader.setLenient(true);
-//
-//		JsonObject json = g.fromJson(reader, JsonObject.class);
+	@SneakyThrows
+	public ApiGatewayProxyResponse  handleRequest(ApiGatewayProxyRequest event, Context context) {
 
 		context.getLogger().log("Received event: " + event);
 
@@ -41,7 +37,7 @@ public class LambdaFunctionHandler implements RequestHandler<Map<String,Object>,
 		List<PlayerInfo> scanResult = mapper.scan(PlayerInfo.class, new DynamoDBScanExpression());
 		List<PlayerInfo> items = new ArrayList<>();		
 
-		String username = "Darknight091";
+		String username = event.getPathParameters().get("username");
 
 		for(PlayerInfo currentPlayer: scanResult) {
 			if (currentPlayer.getUserName().equals(username)) {
@@ -58,13 +54,12 @@ public class LambdaFunctionHandler implements RequestHandler<Map<String,Object>,
 			}
 		}
 
-		Map<String, Object> response = new HashMap<>();
-		Map<String, String> headers = new HashMap<>();
-		response.put("statusCode", 200);
-		headers.put("Access-Control-Allow-Origin", "*");
-		response.put("isBase64Encoded", false);
-		response.put("headers", headers);
-		response.put("body", "hi");
+		ApiGatewayProxyResponse response = new ApiGatewayProxyResponse();
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Access-Control-Allow-Origin", "*");
+        response.setHeaders(headers);
+        response.setBody(objectMapper.writeValueAsString(items));
+        
 		return response;
 	}
 }

@@ -1,1 +1,5 @@
+com\amazonaws\lambda\saveuser\ApiGatewayProxyRequest.class
+com\amazonaws\lambda\saveuser\ApiGatewayProxyResponse.class
 com\amazonaws\lambda\saveuser\LambdaFunctionHandler.class
+com\amazonaws\lambda\saveuser\BodyJson.class
+com\amazonaws\lambda\saveuser\RequestContext.class

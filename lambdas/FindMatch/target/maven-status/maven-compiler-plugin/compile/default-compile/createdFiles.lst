@@ -1,3 +1,6 @@
-com\amazonaws\lambda\findmatch\LambdaFunctionHandler.class
 com\amazonaws\lambda\findmatch\GameSearch.class
 com\amazonaws\lambda\findmatch\PlayerInfo.class
+com\amazonaws\lambda\findmatch\LambdaFunctionHandler.class
+com\amazonaws\lambda\findmatch\ApiGatewayProxyRequest.class
+com\amazonaws\lambda\findmatch\ApiGatewayProxyResponse.class
+com\amazonaws\lambda\findmatch\RequestContext.class

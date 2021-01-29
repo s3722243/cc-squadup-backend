@@ -21,51 +21,69 @@ import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+import lombok.SneakyThrows;
 
-public class LambdaFunctionHandler implements RequestHandler<Object, String> {
+
+public class LambdaFunctionHandler implements RequestHandler<ApiGatewayProxyRequest, ApiGatewayProxyResponse> {
 	static AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().build();
 	static DynamoDB dynamoDB = new DynamoDB(client);
-
+    private final ObjectMapper objectMapper = new ObjectMapper();
 	static DynamoDBMapper mapper = new DynamoDBMapper(client);
+	
 	@Override
-	public String handleRequest(Object input, Context context) {
-		System.out.println(input.getClass());
+	@SneakyThrows
+	public ApiGatewayProxyResponse handleRequest(ApiGatewayProxyRequest input, Context context) {
 		Gson g = new Gson();  
-		System.out.println("This is the input : " + input.toString());
-		JsonObject json = g.fromJson(input.toString(), JsonObject.class);
+		
+		JsonObject json = g.fromJson(input.getBody(), JsonObject.class);
 
-		String username = json.get("Username").getAsString();
-		String gameSearching = json.get("game").getAsString();
+
+		System.out.println("This is the body that is being consumed" + input.getBody());
+		System.out.println("this is the json object " + json);
+		System.out.println("this is the json object " + json.toString());
+		String username = json.get("username").getAsString();
+		String gameSearching = json.get("game_id").getAsString();
+		String regionSearching = json.get("region") != null && !json.get("region").isJsonNull() ? json.get("region").getAsString() : "ANY";
+		String consoleSearching = json.get("console") != null && !json.get("console").isJsonNull()? json.get("console").getAsString() : "ANY";
 		int playersNeeded = json.get("playersNeeded").getAsInt();
 
 
-
+		String body = "Failure";
 		CompletableFuture<String> completableFuture  
-		=  CompletableFuture.supplyAsync(() -> completableFuture(username, gameSearching, playersNeeded));
+		=  CompletableFuture.supplyAsync(() -> completableFuture(username, gameSearching, playersNeeded, regionSearching, consoleSearching));
 
 		try {
-			return completableFuture.get();
+			body = completableFuture.get();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return "Failure";
+		
+
+		ApiGatewayProxyResponse response = new ApiGatewayProxyResponse();
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Access-Control-Allow-Origin", "*");
+        response.setHeaders(headers);
+        response.setBody(objectMapper.writeValueAsString(body));
+        return response;
+		
 	}
 
-	public String completableFuture(String username, String gameSearching, int playerNeeded) {
-		Table searchTable = dynamoDB.getTable("searchTables");
+	public String completableFuture(String username, String gameSearching, int playerNeeded, String regionSearching, String consoleSearching) {
+		Table searchTable = dynamoDB.getTable("find_match");
 		Table playerHistory = dynamoDB.getTable("history_store");
 		String allPlayers = null;
 
 		Item currentUserEntry = new Item()
 				.withPrimaryKey("username", username)
-				.withString("Game", gameSearching)
+				.withString("game_id", gameSearching)
+				.withString("region", regionSearching)
+				.withString("console", consoleSearching)
 				.withInt("players_needed", playerNeeded);
 		searchTable.putItem(currentUserEntry);
 
@@ -86,8 +104,10 @@ public class LambdaFunctionHandler implements RequestHandler<Object, String> {
 						allPlayers = currentUser.getPlayersFound();
 						beenFoundAlready = true;
 					}
-				}else if(currentUser.getGameName().equals(gameSearching) && 
-						currentUser.getPlayerNeeded() == playerNeeded && 
+				}else if(currentUser.getGameId().equals(gameSearching) && 
+						(currentUser.getRegion().equals(regionSearching) || regionSearching.equals("ANY") || currentUser.getRegion().equals("ANY")) &&
+						(currentUser.getConsole().equals(consoleSearching) || consoleSearching.equals("ANY") || currentUser.getConsole().equals("ANY")) &&
+						currentUser.getPlayersNeeded() == playerNeeded && 
 						playersFound < playerNeeded && 
 						!currentUser.getUsername().equals(username)) {
 					playersChosen.add(currentUser);
