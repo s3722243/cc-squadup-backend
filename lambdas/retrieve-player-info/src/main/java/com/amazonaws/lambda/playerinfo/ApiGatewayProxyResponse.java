@@ -10,7 +10,7 @@ import java.util.Map;
 public class ApiGatewayProxyResponse {
     private int statusCode = 200;
     private Map<String, String> headers;
-    private Object body;
+    private String body;
     private boolean isBase64Encoded = false;
 }
 

@@ -17,6 +17,7 @@ public class ApiGatewayProxyRequest {
     private Map<String, String> queryStringParameters = new HashMap<>();
     private Map<String, String> pathParameters = new HashMap<>();
     private Map<String, String> stageVariables;
+    private RequestContext requestContext;
     private Context context;
     private String body;
     private Boolean isBase64Encoded;

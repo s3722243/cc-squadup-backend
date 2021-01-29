@@ -5,24 +5,36 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.amazonaws.services.dynamodbv2.document.Table;
-import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.lambda.runtime.RequestStreamHandler;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+//public class LambdaFunctionHandler implements RequestStreamHandler {
 public class LambdaFunctionHandler implements RequestHandler<ApiGatewayProxyRequest, ApiGatewayProxyResponse> {
-    private static final AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().build();
-    private static final DynamoDB dynamoDB = new DynamoDB(client);
-    private static final DynamoDBMapper mapper = new DynamoDBMapper(client);
 
+    private final AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().build();
+    private final DynamoDB dynamoDB = new DynamoDB(client);
+    private final DynamoDBMapper mapper = new DynamoDBMapper(client);
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+//    public void handleRequest(InputStream inputStream, OutputStream outputStream, Context context) throws IOException {
+//        ApiGatewayProxyRequest event = objectMapper.readValue(inputStream, ApiGatewayProxyRequest.class);
+
+    @SneakyThrows
     public ApiGatewayProxyResponse handleRequest(ApiGatewayProxyRequest event, Context context) {
+
         context.getLogger().log("Received event: " + event);
-        Table userInformation = dynamoDB.getTable("user_details");
+//        Table userInformation = dynamoDB.getTable("user_details");
 
         List<HistoryStore> scanResult = mapper.scan(HistoryStore.class, new DynamoDBScanExpression());
         List<HistoryStore> items = new ArrayList<>();
@@ -43,8 +55,9 @@ public class LambdaFunctionHandler implements RequestHandler<ApiGatewayProxyRequ
         Map<String, String> headers = new HashMap<>();
         headers.put("Access-Control-Allow-Origin", "*");
         response.setHeaders(headers);
-        response.setBody(items);
+        response.setBody(objectMapper.writeValueAsString(items));
 
+//        objectMapper.writeValue(outputStream, response);
         return response;
     }
 }
