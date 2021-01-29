@@ -34,7 +34,7 @@ public class LambdaFunctionHandler implements RequestHandler<ApiGatewayProxyRequ
         String username = event.getPathParameters().get("username");
 
         for (HistoryStore currentPlayer : scanResult) {
-            if (currentPlayer.getUserName().equals(username)) {
+            if (currentPlayer.getUsername().equals(username)) {
 //                for (String currentPlayedPlayer : currentPlayer.getPlayers()) {
 //                    GetItemSpec playerInformation = new GetItemSpec().withPrimaryKey("username", currentPlayedPlayer);
 //                    currentPlayer.addPlayerInfo(userInformation.getItem(playerInformation).asMap());
