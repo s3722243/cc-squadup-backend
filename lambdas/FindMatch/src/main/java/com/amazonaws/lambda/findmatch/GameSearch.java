@@ -27,46 +27,37 @@ public class GameSearch {
 	public GameSearch() {
 	}
 
-
 	@DynamoDBHashKey(attributeName = "game_id")
 	public String getGameId() {
 		return gameId;
 	}
+
 	public void setGameId(String gameId) {
 		this.gameId = gameId;
 	}
-	
+
 	@DynamoDBAttribute(attributeName = "username")
 	public String getUsername() {
 		return username;
 	}
+
 	public void setUsername(String username) {
 		this.username = username;
 	}
-	
-	@DynamoDBAttribute(attributeName = "players_needed")
-	public int getPlayersNeeded() {
-		return playersNeeded;
-	}
-	public void setPlayersNeeded(int playersNeeded) {
-		this.playersNeeded = playersNeeded;
-	}
-	
+
 	@DynamoDBAttribute(attributeName = "players_found")
 	public String getPlayersFound() {
 		return playersFound;
 	}
+
 	public void setPlayersFound(String playersFound) {
 		this.playersFound = playersFound;
 	}
-	
-	
 
 	@DynamoDBAttribute(attributeName = "region")
 	public String getRegion() {
 		return region;
 	}
-
 
 	public void setRegion(String region) {
 		this.region = region;
@@ -77,16 +68,24 @@ public class GameSearch {
 		return console;
 	}
 
-
 	public void setConsole(String console) {
 		this.console = console;
 	}
 
+	@DynamoDBAttribute(attributeName = "players_needed")
+	public int getPlayersNeeded() {
+		return playersNeeded;
+	}
+
+	public void setPlayersNeeded(int playersNeeded) {
+		this.playersNeeded = playersNeeded;
+	}
 
 	@Override
 	public String toString() {
-		return "GameSearch [gameName=" + gameId + ", username=" + username + ", playerNeeded=" + playersNeeded + "]";
+		return "GameSearch [gameId=" + gameId + ", username=" + username + ", playersFound=" + playersFound
+				+ ", region=" + region + ", console=" + console + ", playersNeeded=" + playersNeeded + "]";
 	}
-	
+
 	
 }

@@ -89,7 +89,7 @@ public class LambdaFunctionHandler implements RequestHandler<ApiGatewayProxyRequ
 
 		
 		List<GameSearch> playersChosen = new ArrayList<GameSearch>();
-		playersChosen.add(new GameSearch(gameSearching,username, playerNeeded));
+		playersChosen.add(new GameSearch(gameSearching,username,null , regionSearching, consoleSearching, playerNeeded));
 
 		long t= System.currentTimeMillis();
 		long end = t+120000;
@@ -124,7 +124,7 @@ public class LambdaFunctionHandler implements RequestHandler<ApiGatewayProxyRequ
 		if (playersChosen.size() == playerNeeded || beenFoundAlready) {
 			
 			DeleteItemSpec deleteItemSpec = new DeleteItemSpec()
-					.withPrimaryKey(new PrimaryKey("username", username)).withConditionExpression("Game <= :val")
+					.withPrimaryKey(new PrimaryKey("username", username)).withConditionExpression("game_id <= :val")
 					.withValueMap(new ValueMap().withString(":val", gameSearching));
 
 			searchTable.deleteItem(deleteItemSpec);
