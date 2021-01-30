@@ -11,6 +11,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBScanExpression;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
 import com.amazonaws.services.lambda.runtime.Context;
@@ -35,7 +36,7 @@ public class LambdaFunctionHandler implements RequestHandler<ApiGatewayProxyRequ
 		Table userInformation = dynamoDB.getTable("user_details");
 
 		List<PlayerInfo> scanResult = mapper.scan(PlayerInfo.class, new DynamoDBScanExpression());
-		List<PlayerInfo> items = new ArrayList<>();		
+		List<OutputObject> items = new ArrayList<>();		
 
 		String username = event.getPathParameters().get("username");
 
@@ -43,14 +44,16 @@ public class LambdaFunctionHandler implements RequestHandler<ApiGatewayProxyRequ
 			if (currentPlayer.getUserName().equals(username)) {
 
 				List<String> players = Arrays.asList(currentPlayer.getPlayers().split(","));
+				OutputObject currentOutput = null;
 				for(String currentPlayedPlayer: players) {
-
+					currentOutput = new OutputObject(currentPlayer);
 					GetItemSpec playerInformation = new GetItemSpec().withPrimaryKey("username", currentPlayedPlayer);
-					currentPlayer.addPlayerInfo(userInformation.getItem(playerInformation).asMap());
+					Item playerInfo = userInformation.getItem(playerInformation);
+					if (playerInfo != null ) {
+						currentOutput.addPlayerInfo(playerInfo.asMap());
+					}
 				}
-
-
-				items.add(currentPlayer);
+				items.add(currentOutput);
 			}
 		}
 

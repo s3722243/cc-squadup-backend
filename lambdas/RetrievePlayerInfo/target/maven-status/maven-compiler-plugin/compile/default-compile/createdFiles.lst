@@ -1,4 +1,5 @@
 com\amazonaws\lambda\playerinfo\ApiGatewayProxyRequest.class
+com\amazonaws\lambda\playerinfo\OutputObject.class
 com\amazonaws\lambda\playerinfo\PlayerInfo.class
 com\amazonaws\lambda\playerinfo\ApiGatewayProxyResponse.class
 com\amazonaws\lambda\playerinfo\LambdaFunctionHandler.class

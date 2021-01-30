@@ -63,12 +63,13 @@ public class PlayerInfo {
 	public void addPlayerInfo(Map<String, Object> playerInfo) {
 		playerInformationList.add(playerInfo);
 	}
-	
+
 	@Override
 	public String toString() {
-		return "{userName=" + userName + ", gamePlayed=" + gamePlayed + ", dayPlayed=" + dayPlayed
-				+ ", playerInformationList=" + playerInformationList + "}";
+		return "[userName=" + userName + ", gamePlayed=" + gamePlayed + ", dayPlayed=" + dayPlayed
+				+ ", playerInformationList=" + playerInformationList + "]";
 	}
+	
 	
 	
 }
