@@ -92,24 +92,24 @@ public class LambdaFunctionHandler implements RequestHandler<ApiGatewayProxyRequ
 		playersChosen.add(new GameSearch(gameSearching,username,null , regionSearching, consoleSearching, playerNeeded));
 
 		long t= System.currentTimeMillis();
-		long end = t+120000;
+		long end = t+20000;
 		int playersFound = 1;
 		boolean beenFoundAlready = false;
 		while((playersFound != playerNeeded && !beenFoundAlready) && t < end) {
 			List<GameSearch> scanResult = mapper.scan(GameSearch.class, new DynamoDBScanExpression());
 			playersFound = 1;
 			for (GameSearch currentUser : scanResult) {
+				System.out.println("This is the currentPlayer " +currentUser.toString());
 				if (currentUser.getUsername().equals(username)) {
 					if (currentUser.getPlayersFound() != null) {
 						allPlayers = currentUser.getPlayersFound();
 						beenFoundAlready = true;
 					}
-				}else if(currentUser.getGameId().equals(gameSearching) && 
+				}else if(currentUser.getGameId().equals(gameSearching) && (currentUser.getPlayersFound() == null || currentUser.getPlayersFound().equals("")) && 
 						(currentUser.getRegion().equals(regionSearching) || regionSearching.equals("ANY") || currentUser.getRegion().equals("ANY")) &&
 						(currentUser.getConsole().equals(consoleSearching) || consoleSearching.equals("ANY") || currentUser.getConsole().equals("ANY")) &&
 						currentUser.getPlayersNeeded() == playerNeeded && 
-						playersFound < playerNeeded && 
-						!currentUser.getUsername().equals(username)) {
+						playersFound < playerNeeded && !currentUser.getUsername().equals(username) ) {
 					playersChosen.add(currentUser);
 					playersFound++;
 					System.out.println("Added a player");
@@ -117,7 +117,7 @@ public class LambdaFunctionHandler implements RequestHandler<ApiGatewayProxyRequ
 			}
 			t = System.currentTimeMillis();
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(4000);
 			} catch (InterruptedException ignored) {}
 		}
 
