@@ -13,6 +13,8 @@
         <module>find-match</module>
         <module>retrieve-player-info</module>
         <module>save-user</module>
+        <module>get-player-details</module>
+        <module>user-details</module>
     </modules>
 
 </project>
